@@ -138,11 +138,11 @@ export default function Index() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [adPhotoUrl, setAdPhotoUrl] = useState<string | null>(null);
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
-  const chatContacts = [
+  const [chatContacts, setChatContacts] = useState([
     { id: 0, name: "Анна К.", last: "Можно договориться о встрече?", time: "14:27", avatar: "🦋", unread: 2 },
     { id: 1, name: "Приют Лапки", last: "Спасибо за интерес!", time: "вчера", avatar: "🏠", unread: 0 },
     { id: 2, name: "Дмитрий В.", last: "Рекс ещё доступен?", time: "вчера", avatar: "🐾", unread: 1 },
-  ];
+  ]);
   const [allMessages, setAllMessages] = useState<Record<number, { id: number; user: string; avatar: string; text: string; time: string; isMe: boolean }[]>>({
     0: [
       { id: 1, user: "Анна К.", avatar: "🦋", text: "Здравствуйте! Расскажите подробнее о Барсике?", time: "14:22", isMe: false },
@@ -459,7 +459,10 @@ export default function Index() {
                     {chatContacts.map((chat, i) => (
                       <div
                         key={chat.id}
-                        onClick={() => setActiveChatId(chat.id)}
+                        onClick={() => {
+                          setActiveChatId(chat.id);
+                          setChatContacts(prev => prev.map(c => c.id === chat.id ? { ...c, unread: 0 } : c));
+                        }}
                         className={`flex items-center gap-3 px-4 py-4 cursor-pointer hover:bg-muted/50 active:bg-muted transition-colors ${i > 0 ? "border-t border-border" : ""}`}
                       >
                         <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center text-2xl flex-shrink-0">{chat.avatar}</div>
