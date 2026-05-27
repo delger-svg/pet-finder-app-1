@@ -11,12 +11,12 @@ const T: Record<Lang, Record<string, string>> = {
     heroSub: "Сегодня ищут дом", heroCta: "Помочь сейчас →", heroCount: "128 питомцев",
     searchPlaceholder: "Имя или порода...", allTypes: "Все виды", allCities: "Все города",
     found: "Найдено:", notFound: "Питомцев не найдено", changeFilters: "Попробуй изменить фильтры",
-    mapTitle: "Карта питомцев", mapSub: "Москва и окрестности", nearest: "Ближайшие питомцы",
+    mapTitle: "Карта питомцев", mapSub: "Красноярский край", nearest: "Ближайшие питомцы",
     details: "Подробнее", youAreHere: "📍 Вы здесь",
     chatTitle: "Чат", online: "● Онлайн", messagePlaceholder: "Написать сообщение...",
     favTitle: "Избранное", favSaved: "питомца сохранено", favEmpty: "Пока пусто",
     favHint: "Нажми ❤️ на карточке питомца,\nчтобы добавить в избранное", findPet: "Найти питомца",
-    profileName: "Александра", profileCity: "Москва", profileSince: "С нами с марта 2024",
+    profileName: "Александра", profileCity: "Красноярск", profileSince: "С нами с марта 2024",
     myPets: "Мои питомцы", add: "Добавить", notifications: "Уведомления", enabled: "Включены",
     security: "Безопасность", verified: "Верифицирован", support: "Поддержка", settings: "Настройки",
     logout: "Выйти из аккаунта", writeTo: "Написать хозяину",
@@ -55,15 +55,15 @@ const COLLIE_IMG = "https://cdn.poehali.dev/projects/48dbc168-ef97-4112-a5d9-8f2
 type Tab = "feed" | "search" | "map" | "chat" | "favorites" | "profile";
 
 const pets = [
-  { id: 1, name: "Барсик", breed: "Золотистый ретривер", age: "2 года", city: "Москва", type: "Собака", img: DOG_IMG, desc: "Ласковый и игривый пёс, обожает детей и прогулки в парке." },
-  { id: 2, name: "Мурка", breed: "Рыжий табби", age: "1 год", city: "Санкт-Петербург", type: "Кошка", img: CAT_IMG, desc: "Спокойная кошечка, ищет уютный дом с хозяином на диване." },
-  { id: 3, name: "Снежок", breed: "Нидерландский карликовый", age: "8 месяцев", city: "Казань", type: "Кролик", img: RABBIT_IMG, desc: "Пушистый и любопытный, любит морковку и свежую зелень." },
-  { id: 4, name: "Рекс", breed: "Бордер колли", age: "3 года", city: "Москва", type: "Собака", img: COLLIE_IMG, desc: "Активный и умный пёс, знает более 20 команд. Нужен активный хозяин!" },
+  { id: 1, name: "Барсик", breed: "Золотистый ретривер", age: "2 года", city: "Красноярск", type: "Собака", img: DOG_IMG, desc: "Ласковый и игривый пёс, обожает детей и прогулки в парке." },
+  { id: 2, name: "Мурка", breed: "Рыжий табби", age: "1 год", city: "Норильск", type: "Кошка", img: CAT_IMG, desc: "Спокойная кошечка, ищет уютный дом с хозяином на диване." },
+  { id: 3, name: "Снежок", breed: "Нидерландский карликовый", age: "8 месяцев", city: "Ачинск", type: "Кролик", img: RABBIT_IMG, desc: "Пушистый и любопытный, любит морковку и свежую зелень." },
+  { id: 4, name: "Рекс", breed: "Бордер колли", age: "3 года", city: "Красноярск", type: "Собака", img: COLLIE_IMG, desc: "Активный и умный пёс, знает более 20 команд. Нужен активный хозяин!" },
 ];
 
 const news = [
   { id: 1, title: "Приют «Лапки» нашёл дом для 50 кошек за месяц", time: "2 часа назад", emoji: "🐱", tag: "Новость" },
-  { id: 2, title: "Новые правила выгула собак в Москве с июня", time: "5 часов назад", emoji: "📋", tag: "Важно" },
+  { id: 2, title: "Новые правила выгула собак в Красноярске с июня", time: "5 часов назад", emoji: "📋", tag: "Важно" },
   { id: 3, title: "История Рекса: как пёс пережил зиму на улице", time: "вчера", emoji: "🐶", tag: "История" },
   { id: 4, title: "Ветеринарная клиника дарит бесплатные прививки", time: "вчера", emoji: "💉", tag: "Акция" },
 ];
@@ -76,10 +76,10 @@ const initMessages = [
 ];
 
 const mapPets = [
-  { id: 1, name: "Барсик", type: "🐕", x: 30, y: 40, city: "Парк Горького" },
-  { id: 2, name: "Мурка", type: "🐈", x: 55, y: 25, city: "Тверской район" },
-  { id: 3, name: "Снежок", type: "🐇", x: 70, y: 60, city: "Хамовники" },
-  { id: 4, name: "Рекс", type: "🐕", x: 20, y: 65, city: "Замоскворечье" },
+  { id: 1, name: "Барсик", type: "🐕", x: 30, y: 40, city: "Центральный район" },
+  { id: 2, name: "Мурка", type: "🐈", x: 55, y: 25, city: "Свердловский район" },
+  { id: 3, name: "Снежок", type: "🐇", x: 70, y: 60, city: "Советский район" },
+  { id: 4, name: "Рекс", type: "🐕", x: 20, y: 65, city: "Октябрьский район" },
 ];
 
 export default function Index() {
@@ -98,12 +98,12 @@ export default function Index() {
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showNewAd, setShowNewAd] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: "Александра", city: "Москва", phone: "+7 900 123-45-67", about: "Люблю животных, особенно собак 🐾",
+    name: "Александра", city: "Красноярск", phone: "+7 900 123-45-67", about: "Люблю животных, особенно собак 🐾",
   });
   const [editProfile, setEditProfile] = useState(profileData);
   const [ads, setAds] = useState([
-    { id: 1, petName: "Барсик", type: "Собака", breed: "Золотистый ретривер", city: "Москва", status: "active", img: DOG_IMG, views: 34, date: "12 мая" },
-    { id: 2, petName: "Мурка", type: "Кошка", breed: "Рыжий табби", city: "СПб", status: "closed", img: CAT_IMG, views: 87, date: "3 апреля" },
+    { id: 1, petName: "Барсик", type: "Собака", breed: "Золотистый ретривер", city: "Красноярск", status: "active", img: DOG_IMG, views: 34, date: "12 мая" },
+    { id: 2, petName: "Мурка", type: "Кошка", breed: "Рыжий табби", city: "Красноярск", status: "closed", img: CAT_IMG, views: 87, date: "3 апреля" },
   ]);
   const [newAd, setNewAd] = useState({ petName: "", type: "Собака", breed: "", city: "", desc: "" });
   const [showNotifSettings, setShowNotifSettings] = useState(false);
@@ -122,7 +122,7 @@ export default function Index() {
   const [notifList] = useState([
     { id: 1, icon: "💬", title: "Анна К. написала вам", desc: "Можно договориться о встрече?", time: "14:27", read: false },
     { id: 2, icon: "👁️", title: "34 просмотра объявления", desc: "Барсик — Золотистый ретривер", time: "13:00", read: false },
-    { id: 3, icon: "🐾", title: "Новый питомец рядом с вами", desc: "Рекс, Бордер колли, Москва", time: "вчера", read: true },
+    { id: 3, icon: "🐾", title: "Новый питомец рядом с вами", desc: "Рекс, Бордер колли, Красноярск", time: "вчера", read: true },
     { id: 4, icon: "❤️", title: "Мурка добавлена в избранное", desc: "Кто-то заинтересовался", time: "вчера", read: true },
     { id: 5, icon: "📋", title: "Новые правила площадки", desc: "Обновление политики конфиденциальности", time: "2 дня назад", read: true },
   ]);
