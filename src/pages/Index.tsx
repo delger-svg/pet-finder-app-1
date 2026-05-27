@@ -121,11 +121,11 @@ export default function Index() {
     quietTo: "08:00",
   });
   const [notifList] = useState([
-    { id: 1, icon: "💬", title: "Анна К. написала вам", desc: "Можно договориться о встрече?", time: "14:27", read: false },
-    { id: 2, icon: "👁️", title: "34 просмотра объявления", desc: "Барсик — Золотистый ретривер", time: "13:00", read: false },
-    { id: 3, icon: "🐾", title: "Новый питомец рядом с вами", desc: "Рекс, Бордер колли, Красноярск", time: "вчера", read: true },
-    { id: 4, icon: "❤️", title: "Мурка добавлена в избранное", desc: "Кто-то заинтересовался", time: "вчера", read: true },
-    { id: 5, icon: "📋", title: "Новые правила площадки", desc: "Обновление политики конфиденциальности", time: "2 дня назад", read: true },
+    { id: 1, icon: "💬", title: "Анна К. написала вам", desc: "Можно договориться о встрече?", time: "14:27", read: false, chatId: 0 },
+    { id: 2, icon: "👁️", title: "34 просмотра объявления", desc: "Барсик — Золотистый ретривер", time: "13:00", read: false, chatId: null },
+    { id: 3, icon: "🐾", title: "Новый питомец рядом с вами", desc: "Рекс, Бордер колли, Красноярск", time: "вчера", read: true, chatId: null },
+    { id: 4, icon: "❤️", title: "Мурка добавлена в избранное", desc: "Кто-то заинтересовался", time: "вчера", read: true, chatId: null },
+    { id: 5, icon: "📋", title: "Новые правила площадки", desc: "Обновление политики конфиденциальности", time: "2 дня назад", read: true, chatId: null },
   ]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [showSecurity, setShowSecurity] = useState(false);
@@ -749,7 +749,18 @@ export default function Index() {
             </div>
             <div className="overflow-y-auto pb-6" style={{ maxHeight: "calc(85vh - 80px)" }}>
               {notifList.map((n, i) => (
-                <div key={n.id} className={`flex items-start gap-3 px-5 py-4 transition-colors ${!n.read ? "bg-primary/5" : ""} ${i > 0 ? "border-t border-border" : ""}`}>
+                <div
+                  key={n.id}
+                  onClick={() => {
+                    if (n.chatId !== null) {
+                      setShowNotifPanel(false);
+                      setActiveTab("chat");
+                      setActiveChatId(n.chatId);
+                      setChatContacts(prev => prev.map(c => c.id === n.chatId ? { ...c, unread: 0 } : c));
+                    }
+                  }}
+                  className={`flex items-start gap-3 px-5 py-4 transition-colors ${!n.read ? "bg-primary/5" : ""} ${i > 0 ? "border-t border-border" : ""} ${n.chatId !== null ? "cursor-pointer hover:bg-muted/60 active:bg-muted" : ""}`}
+                >
                   <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${!n.read ? "bg-primary/15" : "bg-muted"}`}>
                     {n.icon}
                   </div>
@@ -758,7 +769,10 @@ export default function Index() {
                     <p className="text-xs text-muted-foreground mt-0.5 truncate">{n.desc}</p>
                     <p className="text-xs text-muted-foreground mt-1">{n.time}</p>
                   </div>
-                  {!n.read && <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2" />}
+                  <div className="flex items-center gap-1 flex-shrink-0 mt-1">
+                    {!n.read && <div className="w-2 h-2 bg-primary rounded-full" />}
+                    {n.chatId !== null && <Icon name="ChevronRight" size={16} className="text-muted-foreground" />}
+                  </div>
                 </div>
               ))}
             </div>
