@@ -120,7 +120,7 @@ export default function Index() {
     quietFrom: "22:00",
     quietTo: "08:00",
   });
-  const [notifList] = useState([
+  const [notifList, setNotifList] = useState([
     { id: 1, icon: "💬", title: "Анна К. написала вам", desc: "Можно договориться о встрече?", time: "14:27", read: false, chatId: 0 },
     { id: 2, icon: "👁️", title: "34 просмотра объявления", desc: "Барсик — Золотистый ретривер", time: "13:00", read: false, chatId: null },
     { id: 3, icon: "🐾", title: "Новый питомец рядом с вами", desc: "Рекс, Бордер колли, Красноярск", time: "вчера", read: true, chatId: null },
@@ -235,7 +235,7 @@ export default function Index() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowNotifPanel(true)}
+            onClick={() => { setShowNotifPanel(true); setNotifList(prev => prev.map(n => ({ ...n, read: true }))); }}
             className="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
           >
             <Icon name="Bell" size={18} />
