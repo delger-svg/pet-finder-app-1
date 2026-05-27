@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
+import PetMap from "@/components/PetMap";
 
 type Theme = "light" | "dark" | "system";
 type Lang = "ru" | "en";
@@ -76,10 +77,10 @@ const initMessages = [
 ];
 
 const mapPets = [
-  { id: 1, name: "Барсик", type: "🐕", x: 30, y: 40, city: "Центральный район" },
-  { id: 2, name: "Мурка", type: "🐈", x: 55, y: 25, city: "Свердловский район" },
-  { id: 3, name: "Снежок", type: "🐇", x: 70, y: 60, city: "Советский район" },
-  { id: 4, name: "Рекс", type: "🐕", x: 20, y: 65, city: "Октябрьский район" },
+  { id: 1, name: "Барсик", type: "🐕", city: "Центральный район", lat: 56.0097, lng: 92.8725 },
+  { id: 2, name: "Мурка", type: "🐈", city: "Свердловский район", lat: 56.0210, lng: 92.8412 },
+  { id: 3, name: "Снежок", type: "🐇", city: "Советский район", lat: 56.0480, lng: 92.9120 },
+  { id: 4, name: "Рекс", type: "🐕", city: "Октябрьский район", lat: 55.9870, lng: 92.8650 },
 ];
 
 export default function Index() {
@@ -398,56 +399,40 @@ export default function Index() {
         {activeTab === "map" && (
           <div className="animate-fade-in">
             <div className="px-4 pt-5 mb-3">
-              <h2 className="font-black text-2xl">Карта питомцев</h2>
-              <p className="text-muted-foreground text-sm">Москва и окрестности</p>
+              <h2 className="font-black text-2xl">{t.mapTitle}</h2>
+              <p className="text-muted-foreground text-sm">{t.mapSub}</p>
             </div>
-            <div className="mx-4 rounded-3xl overflow-hidden shadow-lg relative" style={{ height: "360px" }}>
-              <div className="w-full h-full bg-gradient-to-br from-green-100 via-green-200 to-teal-100 relative">
-                <div className="absolute inset-0">
-                  <div className="absolute top-1/3 left-0 right-0 h-2 bg-white/60 rounded" />
-                  <div className="absolute top-2/3 left-0 right-0 h-1.5 bg-white/50 rounded" />
-                  <div className="absolute left-1/3 top-0 bottom-0 w-2 bg-white/60 rounded" />
-                  <div className="absolute left-2/3 top-0 bottom-0 w-1.5 bg-white/50 rounded" />
-                  <div className="absolute top-[15%] left-[5%] right-[20%] h-1 bg-white/40 rounded rotate-12" />
-                </div>
-                <div className="absolute top-[20%] left-[10%] w-16 h-12 bg-green-400/40 rounded-xl" />
-                <div className="absolute bottom-[20%] right-[15%] w-20 h-14 bg-green-400/30 rounded-xl" />
-                {mapPets.map(p => (
-                  <button
-                    key={p.id}
-                    className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all ${mapSelected?.id === p.id ? "scale-125" : "scale-100 hover:scale-110"}`}
-                    style={{ left: `${p.x}%`, top: `${p.y}%` }}
-                    onClick={() => setMapSelected(mapSelected?.id === p.id ? null : p)}
-                  >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-lg border-2 ${mapSelected?.id === p.id ? "bg-primary border-white" : "bg-white border-primary"}`}>
-                      {p.type}
-                    </div>
-                  </button>
-                ))}
-                <div className="absolute" style={{ left: "50%", top: "50%", transform: "translate(-50%,-50%)" }}>
-                  <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg" />
-                  <div className="w-10 h-10 bg-blue-200/40 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-ping" />
-                </div>
-                <div className="absolute bottom-3 left-3 bg-white/90 rounded-xl px-3 py-2 text-xs font-semibold">
-                  {t.youAreHere}
-                </div>
-              </div>
+            <div className="mx-4 rounded-3xl overflow-hidden shadow-lg">
+              <PetMap
+                pets={mapPets}
+                selected={mapSelected}
+                onSelect={setMapSelected}
+              />
             </div>
             {mapSelected && (
-              <div className="mx-4 mt-3 bg-white rounded-2xl p-4 shadow-sm animate-scale-in flex items-center gap-3">
+              <div className="mx-4 mt-3 bg-card rounded-2xl p-4 shadow-sm animate-scale-in flex items-center gap-3">
                 <div className="text-3xl">{mapSelected.type}</div>
                 <div className="flex-1">
                   <p className="font-black">{mapSelected.name}</p>
                   <p className="text-sm text-muted-foreground">{mapSelected.city}</p>
                 </div>
-                <button className="bg-primary text-white font-bold px-4 py-2 rounded-full text-sm">{t.details}</button>
+                <button
+                  onClick={() => setMapSelected(null)}
+                  className="bg-primary text-white font-bold px-4 py-2 rounded-full text-sm hover:bg-primary/90 transition-colors"
+                >
+                  {t.details}
+                </button>
               </div>
             )}
-            <div className="px-4 mt-4">
-              <h3 className="font-black text-base mb-3">Ближайшие питомцы</h3>
+            <div className="px-4 mt-4 pb-4">
+              <h3 className="font-black text-base mb-3">{t.nearest}</h3>
               <div className="space-y-2">
                 {mapPets.map(p => (
-                  <div key={p.id} className="bg-white rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm cursor-pointer card-hover" onClick={() => setMapSelected(p)}>
+                  <div
+                    key={p.id}
+                    className={`bg-card rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm cursor-pointer card-hover transition-colors ${mapSelected?.id === p.id ? "ring-2 ring-primary" : ""}`}
+                    onClick={() => setMapSelected(mapSelected?.id === p.id ? null : p)}
+                  >
                     <span className="text-2xl">{p.type}</span>
                     <div className="flex-1">
                       <p className="font-bold text-sm">{p.name}</p>
