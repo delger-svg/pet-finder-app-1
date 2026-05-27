@@ -138,12 +138,13 @@ export default function Index() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [adPhotoUrl, setAdPhotoUrl] = useState<string | null>(null);
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
-  const [chatContacts, setChatContacts] = useState([
+
+  const defaultContacts = [
     { id: 0, name: "Анна К.", last: "Можно договориться о встрече?", time: "14:27", avatar: "🦋", unread: 2 },
     { id: 1, name: "Приют Лапки", last: "Спасибо за интерес!", time: "вчера", avatar: "🏠", unread: 0 },
     { id: 2, name: "Дмитрий В.", last: "Рекс ещё доступен?", time: "вчера", avatar: "🐾", unread: 1 },
-  ]);
-  const [allMessages, setAllMessages] = useState<Record<number, { id: number; user: string; avatar: string; text: string; time: string; isMe: boolean }[]>>({
+  ];
+  const defaultMessages = {
     0: [
       { id: 1, user: "Анна К.", avatar: "🦋", text: "Здравствуйте! Расскажите подробнее о Барсике?", time: "14:22", isMe: false },
       { id: 2, user: "Я", avatar: "😊", text: "Привет! Барсик очень дружелюбный, любит играть с мячом.", time: "14:25", isMe: true },
@@ -158,7 +159,22 @@ export default function Index() {
       { id: 1, user: "Дмитрий В.", avatar: "🐾", text: "Добрый день! Рекс ещё доступен?", time: "вчера", isMe: false },
       { id: 2, user: "Я", avatar: "😊", text: "Да, Рекс ещё ищет хозяина!", time: "вчера", isMe: true },
     ],
+  };
+
+  const [chatContacts, setChatContacts] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("chatContacts") || "null") ?? defaultContacts; } catch { return defaultContacts; }
   });
+  const [allMessages, setAllMessages] = useState<Record<number, { id: number; user: string; avatar: string; text: string; time: string; isMe: boolean }[]>>(() => {
+    try { return JSON.parse(localStorage.getItem("allMessages") || "null") ?? defaultMessages; } catch { return defaultMessages; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("chatContacts", JSON.stringify(chatContacts));
+  }, [chatContacts]);
+
+  useEffect(() => {
+    localStorage.setItem("allMessages", JSON.stringify(allMessages));
+  }, [allMessages]);
 
   const t = T[lang];
 
