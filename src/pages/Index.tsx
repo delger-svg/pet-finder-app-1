@@ -127,6 +127,16 @@ export default function Index() {
     { id: 5, icon: "📋", title: "Новые правила площадки", desc: "Обновление политики конфиденциальности", time: "2 дня назад", read: true },
   ]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [showSecurity, setShowSecurity] = useState(false);
+  const [showSupport, setShowSupport] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [loggedOut, setLoggedOut] = useState(false);
+  const [securityData, setSecurityData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [twoFAEnabled, setTwoFAEnabled] = useState(false);
+  const [supportMessage, setSupportMessage] = useState("");
+  const [supportSent, setSupportSent] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [adPhotoUrl, setAdPhotoUrl] = useState<string | null>(null);
 
   const t = T[lang];
 
@@ -567,7 +577,7 @@ export default function Index() {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-black text-lg">Мои объявления</h3>
                 <button
-                  onClick={() => { setNewAd({ petName: "", type: "Собака", breed: "", city: profileData.city, desc: "" }); setShowNewAd(true); }}
+                  onClick={() => { setNewAd({ petName: "", type: "Собака", breed: "", city: profileData.city, desc: "" }); setAdPhotoUrl(null); setShowNewAd(true); }}
                   className="flex items-center gap-1.5 bg-primary text-white text-xs font-bold px-3 py-2 rounded-full hover:shadow-md transition-shadow"
                 >
                   <Icon name="Plus" size={14} />
@@ -627,8 +637,8 @@ export default function Index() {
               <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
                 {[
                   { icon: "Bell", label: t.notifications, desc: t.enabled, onClick: () => setShowNotifSettings(true) },
-                  { icon: "Shield", label: t.security, desc: t.verified, onClick: () => {} },
-                  { icon: "HelpCircle", label: t.support, desc: "", onClick: () => {} },
+                  { icon: "Shield", label: t.security, desc: t.verified, onClick: () => setShowSecurity(true) },
+                  { icon: "HelpCircle", label: t.support, desc: "", onClick: () => setShowSupport(true) },
                   { icon: "Settings", label: t.settings, desc: "", onClick: () => setShowSettings(true) },
                 ].map((item, i) => (
                   <div key={i} className={`flex items-center gap-3 px-4 py-4 cursor-pointer hover:bg-muted/50 transition-colors ${i > 0 ? "border-t border-border" : ""}`} onClick={item.onClick}>
@@ -643,7 +653,10 @@ export default function Index() {
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-4 mb-6 py-3 rounded-2xl border-2 border-red-200 text-red-500 font-bold text-sm hover:bg-red-50 transition-colors">
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className="w-full mt-4 mb-6 py-3 rounded-2xl border-2 border-red-200 text-red-500 font-bold text-sm hover:bg-red-50 transition-colors"
+              >
                 {t.logout}
               </button>
             </div>
@@ -848,10 +861,22 @@ export default function Index() {
               {/* Avatar */}
               <div className="flex justify-center mb-5">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-orange-300 flex items-center justify-center text-4xl shadow-lg">😊</div>
-                  <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-full flex items-center justify-center shadow-md">
+                  {avatarUrl
+                    ? <img src={avatarUrl} alt="avatar" className="w-20 h-20 rounded-full object-cover shadow-lg" />
+                    : <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-orange-300 flex items-center justify-center text-4xl shadow-lg">😊</div>
+                  }
+                  <label className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-full flex items-center justify-center shadow-md cursor-pointer">
                     <Icon name="Camera" size={13} className="text-white" />
-                  </button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) setAvatarUrl(URL.createObjectURL(file));
+                      }}
+                    />
+                  </label>
                 </div>
               </div>
 
@@ -927,13 +952,33 @@ export default function Index() {
                 </div>
               </div>
 
-              {/* Photo upload placeholder */}
+              {/* Photo upload */}
               <div className="mb-4">
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-2">Фото</label>
-                <div className="w-full h-32 bg-muted rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/80 transition-colors">
-                  <Icon name="Camera" size={28} className="text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground font-semibold">Добавить фото</p>
-                </div>
+                <label className="block cursor-pointer">
+                  {adPhotoUrl ? (
+                    <div className="relative w-full h-36 rounded-2xl overflow-hidden">
+                      <img src={adPhotoUrl} alt="pet" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <p className="text-white font-bold text-sm">Изменить фото</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-32 bg-muted rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 hover:bg-muted/80 transition-colors">
+                      <Icon name="Camera" size={28} className="text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground font-semibold">Добавить фото</p>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (file) setAdPhotoUrl(URL.createObjectURL(file));
+                    }}
+                  />
+                </label>
               </div>
 
               <div className="space-y-3">
@@ -983,6 +1028,180 @@ export default function Index() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Security Modal */}
+      {showSecurity && (
+        <div className="fixed inset-0 z-[200] flex items-end justify-center" onClick={() => setShowSecurity(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative bg-card w-full max-w-md rounded-t-3xl animate-slide-up overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-1 bg-border rounded-full" /></div>
+            <div className="px-5 pb-8 max-h-[85vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-5 mt-2">
+                <h2 className="font-black text-xl">Безопасность</h2>
+                <button onClick={() => setShowSecurity(false)} className="w-8 h-8 bg-muted rounded-full flex items-center justify-center"><Icon name="X" size={15} /></button>
+              </div>
+
+              {/* 2FA */}
+              <div className="bg-muted/50 rounded-2xl p-4 mb-5 flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Icon name="Smartphone" size={18} className="text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-sm">Двухфакторная аутентификация</p>
+                  <p className="text-xs text-muted-foreground">{twoFAEnabled ? "Включена — аккаунт защищён" : "Выключена — рекомендуем включить"}</p>
+                </div>
+                <button
+                  onClick={() => setTwoFAEnabled(p => !p)}
+                  className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${twoFAEnabled ? "bg-green-500" : "bg-muted"}`}
+                >
+                  <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all" style={{ left: twoFAEnabled ? "22px" : "2px" }} />
+                </button>
+              </div>
+
+              {/* Change password */}
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">Смена пароля</p>
+              <div className="space-y-3 mb-5">
+                {[
+                  { label: "Текущий пароль", key: "currentPassword" },
+                  { label: "Новый пароль", key: "newPassword" },
+                  { label: "Повторите новый пароль", key: "confirmPassword" },
+                ].map(f => (
+                  <div key={f.key}>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1">{f.label}</label>
+                    <input
+                      type="password"
+                      value={securityData[f.key as keyof typeof securityData]}
+                      onChange={e => setSecurityData(p => ({ ...p, [f.key]: e.target.value }))}
+                      placeholder="••••••••"
+                      className="w-full px-4 py-3 bg-muted rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                  </div>
+                ))}
+                {securityData.newPassword && securityData.confirmPassword && securityData.newPassword !== securityData.confirmPassword && (
+                  <p className="text-xs text-red-500 font-semibold">Пароли не совпадают</p>
+                )}
+              </div>
+
+              <button
+                onClick={() => {
+                  if (securityData.newPassword && securityData.newPassword === securityData.confirmPassword) {
+                    setSecurityData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                    setShowSecurity(false);
+                  }
+                }}
+                disabled={!securityData.currentPassword || !securityData.newPassword || securityData.newPassword !== securityData.confirmPassword}
+                className="w-full bg-primary text-white font-bold py-4 rounded-2xl hover:shadow-lg transition-shadow disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Сохранить пароль
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Support Modal */}
+      {showSupport && (
+        <div className="fixed inset-0 z-[200] flex items-end justify-center" onClick={() => setShowSupport(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative bg-card w-full max-w-md rounded-t-3xl animate-slide-up overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-1 bg-border rounded-full" /></div>
+            <div className="px-5 pb-8 max-h-[85vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-5 mt-2">
+                <h2 className="font-black text-xl">Поддержка</h2>
+                <button onClick={() => { setShowSupport(false); setSupportSent(false); }} className="w-8 h-8 bg-muted rounded-full flex items-center justify-center"><Icon name="X" size={15} /></button>
+              </div>
+
+              {supportSent ? (
+                <div className="text-center py-8 animate-fade-in">
+                  <div className="text-5xl mb-4">✅</div>
+                  <p className="font-black text-xl mb-2">Отправлено!</p>
+                  <p className="text-sm text-muted-foreground mb-6">Мы ответим вам в течение 24 часов</p>
+                  <button onClick={() => { setSupportSent(false); setShowSupport(false); }} className="bg-primary text-white font-bold px-8 py-3 rounded-2xl">Закрыть</button>
+                </div>
+              ) : (
+                <>
+                  {/* FAQ */}
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">Часто задаваемые вопросы</p>
+                  <div className="bg-card border border-border rounded-2xl overflow-hidden mb-5 shadow-sm">
+                    {[
+                      { q: "Как разместить объявление?", a: "Перейдите в Профиль → Мои объявления → Добавить" },
+                      { q: "Как связаться с владельцем?", a: "Нажмите «Написать хозяину» на карточке питомца" },
+                      { q: "Как удалить аккаунт?", a: "Напишите нам в поддержку — удалим в течение 3 дней" },
+                    ].map((item, i) => (
+                      <div key={i} className={`px-4 py-3.5 ${i > 0 ? "border-t border-border" : ""}`}>
+                        <p className="font-bold text-sm mb-1">{item.q}</p>
+                        <p className="text-xs text-muted-foreground">{item.a}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Message form */}
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">Написать нам</p>
+                  <textarea
+                    value={supportMessage}
+                    onChange={e => setSupportMessage(e.target.value)}
+                    placeholder="Опишите вашу проблему или вопрос..."
+                    rows={4}
+                    className="w-full px-4 py-3 bg-muted rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary text-sm resize-none mb-4"
+                  />
+                  <button
+                    onClick={() => { if (supportMessage.trim()) { setSupportSent(true); setSupportMessage(""); } }}
+                    disabled={!supportMessage.trim()}
+                    className="w-full bg-primary text-white font-bold py-4 rounded-2xl hover:shadow-lg transition-shadow disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Отправить сообщение
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Confirm */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-6" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative bg-card w-full max-w-sm rounded-3xl p-6 animate-scale-in shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-5">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Icon name="LogOut" size={28} className="text-red-500" />
+              </div>
+              <h3 className="font-black text-xl mb-1">Выйти из аккаунта?</h3>
+              <p className="text-sm text-muted-foreground">Вы сможете войти снова в любой момент</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 py-3 rounded-2xl border-2 border-border font-bold text-sm hover:bg-muted transition-colors"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={() => { setShowLogoutConfirm(false); setLoggedOut(true); }}
+                className="flex-1 py-3 rounded-2xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 transition-colors"
+              >
+                Выйти
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logged out screen */}
+      {loggedOut && (
+        <div className="fixed inset-0 z-[300] bg-background flex flex-col items-center justify-center px-8 animate-fade-in">
+          <div className="text-6xl mb-6">🐾</div>
+          <h2 className="font-black text-2xl mb-2 text-center">Вы вышли из аккаунта</h2>
+          <p className="text-muted-foreground text-center mb-8">До встречи! Питомцы ждут вас снова</p>
+          <button
+            onClick={() => setLoggedOut(false)}
+            className="bg-primary text-white font-bold px-8 py-4 rounded-2xl hover:shadow-lg transition-shadow"
+          >
+            Войти снова
+          </button>
         </div>
       )}
 
