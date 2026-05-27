@@ -137,6 +137,28 @@ export default function Index() {
   const [supportSent, setSupportSent] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [adPhotoUrl, setAdPhotoUrl] = useState<string | null>(null);
+  const [activeChatId, setActiveChatId] = useState<number | null>(null);
+  const chatContacts = [
+    { id: 0, name: "Анна К.", last: "Можно договориться о встрече?", time: "14:27", avatar: "🦋", unread: 2 },
+    { id: 1, name: "Приют Лапки", last: "Спасибо за интерес!", time: "вчера", avatar: "🏠", unread: 0 },
+    { id: 2, name: "Дмитрий В.", last: "Рекс ещё доступен?", time: "вчера", avatar: "🐾", unread: 1 },
+  ];
+  const [allMessages, setAllMessages] = useState<Record<number, { id: number; user: string; avatar: string; text: string; time: string; isMe: boolean }[]>>({
+    0: [
+      { id: 1, user: "Анна К.", avatar: "🦋", text: "Здравствуйте! Расскажите подробнее о Барсике?", time: "14:22", isMe: false },
+      { id: 2, user: "Я", avatar: "😊", text: "Привет! Барсик очень дружелюбный, любит играть с мячом.", time: "14:25", isMe: true },
+      { id: 3, user: "Анна К.", avatar: "🦋", text: "Отлично! Можно договориться о встрече?", time: "14:27", isMe: false },
+    ],
+    1: [
+      { id: 1, user: "Приют Лапки", avatar: "🏠", text: "Здравствуйте! Чем могу помочь?", time: "11:00", isMe: false },
+      { id: 2, user: "Я", avatar: "😊", text: "Интересует котёнок Мурка.", time: "11:05", isMe: true },
+      { id: 3, user: "Приют Лапки", avatar: "🏠", text: "Спасибо за интерес! Мурка ещё ищет дом.", time: "11:10", isMe: false },
+    ],
+    2: [
+      { id: 1, user: "Дмитрий В.", avatar: "🐾", text: "Добрый день! Рекс ещё доступен?", time: "вчера", isMe: false },
+      { id: 2, user: "Я", avatar: "😊", text: "Да, Рекс ещё ищет хозяина!", time: "вчера", isMe: true },
+    ],
+  });
 
   const t = T[lang];
 
@@ -425,68 +447,102 @@ export default function Index() {
 
         {/* CHAT TAB */}
         {activeTab === "chat" && (
-          <div className="animate-fade-in flex flex-col">
-            <div className="px-4 pt-5 mb-3">
-              <h2 className="font-black text-2xl">{t.chatTitle}</h2>
-            </div>
-            <div className="px-4 mb-4">
-              <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-                {[
-                  { name: "Анна К.", last: "Можно договориться о встрече?", time: "14:27", avatar: "🦋", unread: 2 },
-                  { name: "Приют Лапки", last: "Спасибо за интерес!", time: "вчера", avatar: "🏠", unread: 0 },
-                  { name: "Дмитрий В.", last: "Рекс ещё доступен?", time: "вчера", avatar: "🐾", unread: 1 },
-                ].map((chat, i) => (
-                  <div key={i} className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors ${i > 0 ? "border-t border-border" : ""}`}>
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center text-2xl flex-shrink-0">{chat.avatar}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-bold text-sm">{chat.name}</p>
-                        <span className="text-xs text-muted-foreground">{chat.time}</span>
+          <div className="animate-fade-in h-full">
+            {activeChatId === null ? (
+              /* Список чатов */
+              <div>
+                <div className="px-4 pt-5 mb-3">
+                  <h2 className="font-black text-2xl">{t.chatTitle}</h2>
+                </div>
+                <div className="px-4">
+                  <div className="bg-card rounded-2xl overflow-hidden shadow-sm">
+                    {chatContacts.map((chat, i) => (
+                      <div
+                        key={chat.id}
+                        onClick={() => setActiveChatId(chat.id)}
+                        className={`flex items-center gap-3 px-4 py-4 cursor-pointer hover:bg-muted/50 active:bg-muted transition-colors ${i > 0 ? "border-t border-border" : ""}`}
+                      >
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center text-2xl flex-shrink-0">{chat.avatar}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-0.5">
+                            <p className="font-bold text-sm">{chat.name}</p>
+                            <span className="text-xs text-muted-foreground">{chat.time}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">{chat.last}</p>
+                        </div>
+                        {chat.unread > 0 && (
+                          <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-white text-[10px] font-bold">{chat.unread}</span>
+                          </div>
+                        )}
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">{chat.last}</p>
-                    </div>
-                    {chat.unread > 0 && (
-                      <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-xs font-bold">{chat.unread}</span>
-                      </div>
-                    )}
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-            <div className="mx-4 bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-muted/30">
-                <div className="w-9 h-9 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center text-xl">🦋</div>
-                <div>
-                  <p className="font-bold text-sm">Анна К.</p>
-                  <p className="text-xs text-secondary">{t.online}</p>
                 </div>
               </div>
-              <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
-                {messages.map(msg => (
-                  <div key={msg.id} className={`flex gap-2 ${msg.isMe ? "flex-row-reverse" : ""}`}>
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-base flex-shrink-0">{msg.avatar}</div>
-                    <div className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm ${msg.isMe ? "bg-primary text-white rounded-tr-sm" : "bg-muted rounded-tl-sm"}`}>
-                      <p>{msg.text}</p>
-                      <p className={`text-xs mt-1 ${msg.isMe ? "text-white/70" : "text-muted-foreground"}`}>{msg.time}</p>
-                    </div>
+            ) : (
+              /* Открытый чат */
+              <div className="flex flex-col h-full">
+                {/* Шапка чата */}
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card sticky top-0 z-10">
+                  <button
+                    onClick={() => setActiveChatId(null)}
+                    className="w-9 h-9 bg-muted rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors flex-shrink-0"
+                  >
+                    <Icon name="ArrowLeft" size={18} />
+                  </button>
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center text-xl flex-shrink-0">
+                    {chatContacts[activeChatId].avatar}
                   </div>
-                ))}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-black text-sm">{chatContacts[activeChatId].name}</p>
+                    <p className="text-xs text-secondary">{t.online}</p>
+                  </div>
+                </div>
+
+                {/* Сообщения */}
+                <div className="flex-1 p-4 space-y-3 overflow-y-auto">
+                  {(allMessages[activeChatId] || []).map(msg => (
+                    <div key={msg.id} className={`flex gap-2 ${msg.isMe ? "flex-row-reverse" : ""}`}>
+                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-base flex-shrink-0">{msg.avatar}</div>
+                      <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${msg.isMe ? "bg-primary text-white rounded-tr-sm" : "bg-muted rounded-tl-sm"}`}>
+                        <p>{msg.text}</p>
+                        <p className={`text-xs mt-1 ${msg.isMe ? "text-white/70" : "text-muted-foreground"}`}>{msg.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Ввод */}
+                <div className="flex items-center gap-2 px-4 py-3 border-t border-border bg-card">
+                  <input
+                    type="text"
+                    placeholder={t.messagePlaceholder}
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter" && chatInput.trim()) {
+                        const newMsg = { id: Date.now(), user: lang === "ru" ? "Я" : "Me", avatar: "😊", text: chatInput, time: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }), isMe: true };
+                        setAllMessages(prev => ({ ...prev, [activeChatId]: [...(prev[activeChatId] || []), newMsg] }));
+                        setChatInput("");
+                      }
+                    }}
+                    className="flex-1 bg-muted rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <button
+                    onClick={() => {
+                      if (!chatInput.trim()) return;
+                      const newMsg = { id: Date.now(), user: lang === "ru" ? "Я" : "Me", avatar: "😊", text: chatInput, time: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }), isMe: true };
+                      setAllMessages(prev => ({ ...prev, [activeChatId]: [...(prev[activeChatId] || []), newMsg] }));
+                      setChatInput("");
+                    }}
+                    className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary/90 transition-colors flex-shrink-0"
+                  >
+                    <Icon name="Send" size={16} />
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2 p-3 border-t border-border">
-                <input
-                  type="text"
-                  placeholder={t.messagePlaceholder}
-                  value={chatInput}
-                  onChange={e => setChatInput(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && sendMessage()}
-                  className="flex-1 bg-muted rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary font-nunito"
-                />
-                <button onClick={sendMessage} className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary/90 transition-colors flex-shrink-0">
-                  <Icon name="Send" size={16} />
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         )}
 
